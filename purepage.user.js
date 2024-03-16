@@ -7,7 +7,7 @@
 // @match        http://127.0.0.1:17777/*.html
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=0.1
 // @grant        none
-// @require      file:///E:/_codes/airead/purepage.user.js
+// @require      file:///E:/_codes/purepage/purepage.user.js
 // ==/UserScript==
 
 // Informative Elements
@@ -57,9 +57,19 @@ const CUSTOM_CSS = `
 }
 `;
 
-// Removable Elements classes and ids
+// Removed Elements classes and ids
 
-const COMMON_REMOVABLE_CLASSES = [
+const WIKIPEDIA_REMOVED_CLASSES = [
+    "mw-editsection",
+    "(vector-)((user-links)|(menu-content)|(body-before-content)|(page-toolbar))",
+    "(footer-)((places)|(icons))",
+];
+
+const REMOVED_CLASSES = [].concat(WIKIPEDIA_REMOVED_CLASSES);
+
+// Excluded Elements classes and ids
+
+const COMMON_EXCLUDED_CLASSES = [
     "(?<!has)sidebar",
     "footer",
     "related",
@@ -68,8 +78,8 @@ const COMMON_REMOVABLE_CLASSES = [
     "offcanvas",
     "navbar",
 ];
-const WIKIPEDIA_REMOVABLE_CLASSES = [
-    "(mw-)((jump-link)|(editsection)|(valign-text-top))",
+const WIKIPEDIA_EXCLUDED_CLASSES = [
+    "(mw-)((jump-link)|(valign-text-top))",
     "language-list",
     "p-lang-btn",
     "(vector-)((header)|(column)|(sticky-pinned)|(dropdown-content)|(page-toolbar)|(body-before-content)|(settings))",
@@ -79,14 +89,15 @@ const WIKIPEDIA_REMOVABLE_CLASSES = [
     "contentSub",
     "siteNotice",
 ];
-const ARXIV_REMOVABLE_CLASSES = ["(ltx_)((flex_break)|(pagination))"];
-const DOCS_PYTHON_REMOVABLE_CLASSES = ["clearer"];
+const ARXIV_EXCLUDED_CLASSES = ["(ltx_)((flex_break)|(pagination))"];
+const DOCS_PYTHON_EXCLUDED_CLASSES = ["clearer"];
 
-const REMOVABLE_CLASSES = [].concat(
-    COMMON_REMOVABLE_CLASSES,
-    WIKIPEDIA_REMOVABLE_CLASSES,
-    ARXIV_REMOVABLE_CLASSES,
-    DOCS_PYTHON_REMOVABLE_CLASSES
+const EXCLUDED_CLASSES = [].concat(
+    REMOVED_CLASSES,
+    COMMON_EXCLUDED_CLASSES,
+    WIKIPEDIA_EXCLUDED_CLASSES,
+    ARXIV_EXCLUDED_CLASSES,
+    DOCS_PYTHON_EXCLUDED_CLASSES
 );
 
 // Helper Functions
@@ -168,31 +179,47 @@ class ReadableElementsSelector {
         }
         return false;
     }
-    filter_atom_elements(elements) {
-        let atomized_elements = [];
-        for (let i = 0; i < elements.length; i++) {
-            if (this.is_atomized(elements[i])) {
-                atomized_elements.push(elements[i]);
+    filter_removed_elements(elements) {
+        let output_elements = elements;
+        // if class+id of element+parents match any pattern in REMOVED_CLASSES, then remove it
+        for (let i = 0; i < REMOVED_CLASSES.length; i++) {
+            for (let j = 0; j < output_elements.length; j++) {
+                if (
+                    is_class_id_match_pattern(
+                        output_elements[j],
+                        REMOVED_CLASSES[i]
+                    )
+                ) {
+                    output_elements[j].remove();
+                }
             }
         }
-        return atomized_elements;
+        return output_elements;
     }
-
-    filter_info_elements(elements) {
-        let info_elements = elements;
-        // if class+id of element+parents match any pattern in REMOVABLE_CLASSES, then remove it
-        for (let i = 0; i < REMOVABLE_CLASSES.length; i++) {
-            info_elements = info_elements.filter(
+    filter_excluded_elements(elements) {
+        let output_elements = elements;
+        // if class+id of element+parents match any pattern in EXCLUDED_CLASSES, then exclude it
+        for (let i = 0; i < EXCLUDED_CLASSES.length; i++) {
+            output_elements = output_elements.filter(
                 (element) =>
-                    !is_class_id_match_pattern(element, REMOVABLE_CLASSES[i])
+                    !is_class_id_match_pattern(element, EXCLUDED_CLASSES[i])
             );
         }
-        return info_elements;
+        return output_elements;
     }
-
+    filter_atom_elements(elements) {
+        let output_elements = [];
+        for (let i = 0; i < elements.length; i++) {
+            if (this.is_atomized(elements[i])) {
+                output_elements.push(elements[i]);
+            }
+        }
+        return output_elements;
+    }
     add_style_to_reading_elements() {
         let reading_elements = get_descendants(document.body);
-        reading_elements = this.filter_info_elements(reading_elements);
+        this.filter_removed_elements(reading_elements);
+        reading_elements = this.filter_excluded_elements(reading_elements);
         reading_elements = this.filter_atom_elements(reading_elements);
         console.log("Reading elements count:", reading_elements.length);
         for (let i = 0; i < reading_elements.length; i++) {
