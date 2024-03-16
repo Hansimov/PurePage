@@ -110,6 +110,19 @@ function is_class_id_match_pattern(element, pattern_str) {
     return is_match;
 }
 
+// width of descendants means: max count of child elements per level
+function calc_width_of_descendants(element) {
+    let max_count = element.childElementCount;
+    let descendants = get_descendants(element);
+    for (let i = 0; i < descendants.length; i++) {
+        let count = descendants[i].childElementCount;
+        if (count > max_count) {
+            max_count = count;
+        }
+    }
+    return max_count;
+}
+
 // Main Classes
 
 class ReadableElementsSelector {
@@ -128,9 +141,9 @@ class ReadableElementsSelector {
                 descendants,
                 PARA_TAGS
             );
-            // if descendant has atom, and descendant count is 1, then it is not atomized
+            // if descendant has atom, and descendant width is 1, then it is not atomized
             const is_descendant_has_only_atom =
-                descendants.length === 1 &&
+                calc_width_of_descendants(element) == 1 &&
                 is_elements_has_tags(descendants, ATOM_TAGS);
 
             return !(
