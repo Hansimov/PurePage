@@ -10,7 +10,7 @@
 // @require      file:///E:/_codes/purepage/purepage.user.js
 // ==/UserScript==
 
-// Informative Elements
+// Informative Tags
 
 const HEADER_TAGS = ["h1", "h2", "h3", "h4", "h5", "h6"];
 const TABLE_TAGS = ["table"];
@@ -59,19 +59,22 @@ const CUSTOM_CSS = `
 
 // Removed Elements classes and ids
 
+const COMMON_REMOVED_CLASSES = ["footer"];
 const WIKIPEDIA_REMOVED_CLASSES = [
     "mw-editsection",
     "(vector-)((user-links)|(menu-content)|(body-before-content)|(page-toolbar))",
     "(footer-)((places)|(icons))",
 ];
 
-const REMOVED_CLASSES = [].concat(WIKIPEDIA_REMOVED_CLASSES);
+const REMOVED_CLASSES = [].concat(
+    COMMON_REMOVED_CLASSES,
+    WIKIPEDIA_REMOVED_CLASSES
+);
 
 // Excluded Elements classes and ids
 
 const COMMON_EXCLUDED_CLASSES = [
     "(?<!has)sidebar",
-    "footer",
     "related",
     "comment",
     "topbar",
@@ -135,8 +138,8 @@ function is_class_id_match_pattern(element, pattern_str) {
     return is_match;
 }
 
-// width of descendants means: max count of child elements per level
 function calc_width_of_descendants(element) {
+    // width of descendants means: max count of child elements per level
     let max_count = element.childElementCount;
     let descendants = get_descendants(element);
     for (let i = 0; i < descendants.length; i++) {
