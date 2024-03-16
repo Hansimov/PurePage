@@ -25,10 +25,10 @@ const FIGURE_TAGS = ["figure"];
 
 const P_TAGS = ["p"];
 const LI_TAGS = ["li"];
+const LINK_TAGS = ["a"];
 
 const MATH_TAGS = ["math"];
 const CODE_TAGS = ["code"];
-const LINK_TAGS = ["a"];
 
 const ATOM_TAGS = [].concat(
     HEADER_TAGS,
@@ -43,7 +43,7 @@ const PARA_TAGS = [].concat(GROUP_TAGS, LIST_TAGS, P_TAGS, LI_TAGS);
 const CUSTOM_CSS = `
 .airead-info-element {
     border: 1px solid red;
-    // background-color: #ffcccc;
+    background-color: #ffcccc;
 }
 `;
 
@@ -59,7 +59,7 @@ const COMMON_REMOVABLE_CLASSES = [
     "navbar",
 ];
 const WIKIPEDIA_REMOVABLE_CLASSES = [
-    "(mw-)((jump-link)|(editsection))",
+    "(mw-)((jump-link)|(editsection)|(valign-text-top))",
     "language-list",
     "p-lang-btn",
     "(vector-)((header)|(column)|(sticky-pinned)|(dropdown-content)|(page-toolbar)|(body-before-content)|(settings))",
@@ -124,16 +124,15 @@ class ReadableElementsSelector {
         }
         if (PARA_TAGS.includes(tag)) {
             const is_parent_has_atom = is_elements_has_tag(parents, ATOM_TAGS);
-            const is_descent_has_para_or_atom = is_elements_has_tag(
+            const is_descent_has_para = is_elements_has_tag(
                 descents,
-                [].concat(PARA_TAGS, ATOM_TAGS)
+                PARA_TAGS
             );
-            return !(is_parent_has_atom || is_descent_has_para_or_atom);
+            return !(is_parent_has_atom || is_descent_has_para);
         }
         return false;
     }
-    select_atomized_elements() {
-        let elements = get_descents(document.body);
+    select_atomized_elements(elements) {
         let atomized_elements = [];
         for (let i = 0; i < elements.length; i++) {
             if (this.is_atomized(elements[i])) {
@@ -156,8 +155,9 @@ class ReadableElementsSelector {
     }
 
     add_style_to_reading_elements() {
-        let reading_elements = this.select_atomized_elements();
+        let reading_elements = get_descents(document.body);
         reading_elements = this.filter_info_elements(reading_elements);
+        reading_elements = this.select_atomized_elements(reading_elements);
         console.log("Reading elements count:", reading_elements.length);
         for (let i = 0; i < reading_elements.length; i++) {
             reading_elements[i].classList.add("airead-info-element");
