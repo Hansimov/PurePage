@@ -51,9 +51,13 @@ const PARA_TAGS = [].concat(
 );
 
 const CUSTOM_CSS = `
-.airead-info-element {
-    border: 1px solid red !important;
-    background-color: #ffcccc !important;
+.pure-element {
+    border: 1px solid azure !important;
+}
+
+.pure-element:hover {
+    // border: 1px solid azure !important;
+    background-color: azure !important;
 }
 `;
 
@@ -226,7 +230,7 @@ class ReadableElementsSelector {
         reading_elements = this.filter_atom_elements(reading_elements);
         console.log("Reading elements count:", reading_elements.length);
         for (let i = 0; i < reading_elements.length; i++) {
-            reading_elements[i].classList.add("airead-info-element");
+            reading_elements[i].classList.add("pure-element");
         }
     }
 }
