@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AIRead
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.1.1
 // @description  An AI-assisted reading script in browsers.
 // @author       Hansimov
 // @match        http://127.0.0.1:17777/*.html
@@ -16,7 +16,8 @@ var TABLE_TAGS = ["table"];
 var CODE_TAGS = ["pre", "code"];
 var MATH_TAGS = ["math"];
 var BLOCKQUOTE_TAGS = ["blockquote"];
-// var CAPTION_TAGS = ["figcaption"];
+var IMG_TAGS = ["img"];
+var CAPTION_TAGS = ["figcaption"];
 
 var P_TAGS = ["p"];
 var LI_TAGS = ["li"];
@@ -26,12 +27,11 @@ var GROUP_TAGS = ["div", "section"];
 var LIST_TAGS = ["ul", "ol"];
 
 var ATOM_TAGS = HEADER_TAGS.concat(
-    FIGURE_TAGS,
     TABLE_TAGS,
     CODE_TAGS,
-    MATH_TAGS,
-    BLOCKQUOTE_TAGS
-    // CAPTION_TAGS
+    BLOCKQUOTE_TAGS,
+    IMG_TAGS,
+    CAPTION_TAGS
 );
 var PARA_TAGS = [].concat(GROUP_TAGS, LIST_TAGS, P_TAGS, LI_TAGS);
 
@@ -56,24 +56,28 @@ function get_parents(element) {
 class ReadableElementsSelector {
     constructor() {}
     is_atomized(element) {
-        // If tag is in ATOM_TAGS, return true
         var tag = get_tag(element);
-        if (ATOM_TAGS.includes(tag)) {
-            return true;
-        }
-
-        // If tag is in PARA_TAGS, and no parent in ATOM_TAGS, and no descent is in PARA_TAGS, return true
         var decadents = get_descents(element);
         var parents = get_parents(element);
 
-        if (PARA_TAGS.includes(tag)) {
-            for (var i = 0; i < decadents.length; i++) {
-                if (PARA_TAGS.includes(get_tag(decadents[i]))) {
+        if (ATOM_TAGS.includes(tag)) {
+            for (var i = 0; i < parents.length; i++) {
+                if (ATOM_TAGS.includes(get_tag(parents[i]))) {
                     return false;
                 }
             }
+            return true;
+        }
+        if (PARA_TAGS.includes(tag)) {
             for (var i = 0; i < parents.length; i++) {
                 if (ATOM_TAGS.includes(get_tag(parents[i]))) {
+                    return false;
+                }
+            }
+            for (var i = 0; i < decadents.length; i++) {
+                if (
+                    PARA_TAGS.concat(ATOM_TAGS).includes(get_tag(decadents[i]))
+                ) {
                     return false;
                 }
             }
