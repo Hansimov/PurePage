@@ -1,2 +1,2 @@
-# AIRead
-An AI-assisted reading script in browsers.
+# PurePage
+Purify web page by filtering tags and classes
