@@ -10,39 +10,39 @@
 // @require      file:///E:/_codes/airead/airead.user.js
 // ==/UserScript==
 
-var HEADER_TAGS = ["h1", "h2", "h3", "h4", "h5", "h6"];
-var FIGURE_TAGS = ["figure"];
-var TABLE_TAGS = ["table"];
-var CODE_TAGS = ["pre", "code"];
-var MATH_TAGS = ["math"];
-var BLOCKQUOTE_TAGS = ["blockquote"];
-var IMG_TAGS = ["img"];
-var CAPTION_TAGS = ["figcaption"];
+const HEADER_TAGS = ["h1", "h2", "h3", "h4", "h5", "h6"];
+const FIGURE_TAGS = ["figure"];
+const TABLE_TAGS = ["table"];
+const CODE_TAGS = ["pre", "code"];
+const MATH_TAGS = ["math"];
+const BLOCKQUOTE_TAGS = ["blockquote"];
+const IMG_TAGS = ["img"];
+const CAPTION_TAGS = ["figcaption"];
 
-var P_TAGS = ["p"];
-var LI_TAGS = ["li"];
-var LINK_TAGS = ["a"];
+const P_TAGS = ["p"];
+const LI_TAGS = ["li"];
+const LINK_TAGS = ["a"];
 
-var GROUP_TAGS = ["div", "section"];
-var LIST_TAGS = ["ul", "ol"];
+const GROUP_TAGS = ["div", "section"];
+const LIST_TAGS = ["ul", "ol"];
 
-var ATOM_TAGS = HEADER_TAGS.concat(
+const ATOM_TAGS = HEADER_TAGS.concat(
     TABLE_TAGS,
     CODE_TAGS,
     BLOCKQUOTE_TAGS,
     IMG_TAGS,
     CAPTION_TAGS
 );
-var PARA_TAGS = [].concat(GROUP_TAGS, LIST_TAGS, P_TAGS, LI_TAGS);
-
-console.log("ATOM_TAGS:", ATOM_TAGS);
+const PARA_TAGS = [].concat(GROUP_TAGS, LIST_TAGS, P_TAGS, LI_TAGS);
 
 function get_tag(element) {
     return element.tagName.toLowerCase();
 }
+
 function get_descents(element) {
-    return element.querySelectorAll("*");
+    return Array.from(element.querySelectorAll("*"));
 }
+
 function get_parents(element) {
     var parents = [];
     var parent = element.parentElement;
@@ -53,35 +53,27 @@ function get_parents(element) {
     return parents;
 }
 
+function is_elements_has_tag(elements, tags) {
+    return elements.some((element) => tags.includes(get_tag(element)));
+}
+
 class ReadableElementsSelector {
     constructor() {}
     is_atomized(element) {
-        var tag = get_tag(element);
-        var decadents = get_descents(element);
-        var parents = get_parents(element);
+        const tag = get_tag(element);
+        const descents = get_descents(element);
+        const parents = get_parents(element);
 
         if (ATOM_TAGS.includes(tag)) {
-            for (var i = 0; i < parents.length; i++) {
-                if (ATOM_TAGS.includes(get_tag(parents[i]))) {
-                    return false;
-                }
-            }
-            return true;
+            return !is_elements_has_tag(parents, ATOM_TAGS);
         }
         if (PARA_TAGS.includes(tag)) {
-            for (var i = 0; i < parents.length; i++) {
-                if (ATOM_TAGS.includes(get_tag(parents[i]))) {
-                    return false;
-                }
-            }
-            for (var i = 0; i < decadents.length; i++) {
-                if (
-                    PARA_TAGS.concat(ATOM_TAGS).includes(get_tag(decadents[i]))
-                ) {
-                    return false;
-                }
-            }
-            return true;
+            const is_parent_has_atom = is_elements_has_tag(parents, ATOM_TAGS);
+            const is_descent_has_para_or_atom = is_elements_has_tag(
+                descents,
+                PARA_TAGS.concat(ATOM_TAGS)
+            );
+            return !(is_parent_has_atom || is_descent_has_para_or_atom);
         }
         return false;
     }
