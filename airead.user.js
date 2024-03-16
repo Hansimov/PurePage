@@ -81,7 +81,7 @@ function get_tag(element) {
     return element.tagName.toLowerCase();
 }
 
-function get_descents(element) {
+function get_descendants(element) {
     return Array.from(element.querySelectorAll("*"));
 }
 
@@ -95,7 +95,7 @@ function get_parents(element) {
     return parents;
 }
 
-function is_elements_has_tag(elements, tags) {
+function is_elements_has_tags(elements, tags) {
     return elements.some((element) => tags.includes(get_tag(element)));
 }
 
@@ -116,32 +116,32 @@ class ReadableElementsSelector {
     constructor() {}
     is_atomized(element) {
         const tag = get_tag(element);
-        const descents = get_descents(element);
+        const descendants = get_descendants(element);
         const parents = get_parents(element);
 
         if (ATOM_TAGS.includes(tag)) {
-            return !is_elements_has_tag(parents, ATOM_TAGS);
+            return !is_elements_has_tags(parents, ATOM_TAGS);
         }
         if (PARA_TAGS.includes(tag)) {
-            const is_parent_has_atom = is_elements_has_tag(parents, ATOM_TAGS);
-            const is_descent_has_para = is_elements_has_tag(
-                descents,
+            const is_parent_has_atom = is_elements_has_tags(parents, ATOM_TAGS);
+            const is_descendant_has_para = is_elements_has_tags(
+                descendants,
                 PARA_TAGS
             );
-            // if descent has atom, and descent count is equal to 1, then it is not atomized
-            const is_descent_has_only_atom =
-                descents.length === 1 &&
-                is_elements_has_tag(descents, ATOM_TAGS);
+            // if descendant has atom, and descendant count is 1, then it is not atomized
+            const is_descendant_has_only_atom =
+                descendants.length === 1 &&
+                is_elements_has_tags(descendants, ATOM_TAGS);
 
             return !(
                 is_parent_has_atom ||
-                is_descent_has_para ||
-                is_descent_has_only_atom
+                is_descendant_has_para ||
+                is_descendant_has_only_atom
             );
         }
         return false;
     }
-    select_atomized_elements(elements) {
+    filter_atom_elements(elements) {
         let atomized_elements = [];
         for (let i = 0; i < elements.length; i++) {
             if (this.is_atomized(elements[i])) {
@@ -153,7 +153,7 @@ class ReadableElementsSelector {
 
     filter_info_elements(elements) {
         let info_elements = elements;
-        // use regex to filter elements, if class or id of element or its parent match any pattern in REMOVABLE_CLASSES, remove it
+        // if class+id of element+parents match any pattern in REMOVABLE_CLASSES, then remove it
         for (let i = 0; i < REMOVABLE_CLASSES.length; i++) {
             info_elements = info_elements.filter(
                 (element) =>
@@ -164,9 +164,9 @@ class ReadableElementsSelector {
     }
 
     add_style_to_reading_elements() {
-        let reading_elements = get_descents(document.body);
+        let reading_elements = get_descendants(document.body);
         reading_elements = this.filter_info_elements(reading_elements);
-        reading_elements = this.select_atomized_elements(reading_elements);
+        reading_elements = this.filter_atom_elements(reading_elements);
         console.log("Reading elements count:", reading_elements.length);
         for (let i = 0; i < reading_elements.length; i++) {
             reading_elements[i].classList.add("airead-info-element");
