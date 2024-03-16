@@ -13,27 +13,37 @@
 const HEADER_TAGS = ["h1", "h2", "h3", "h4", "h5", "h6"];
 const FIGURE_TAGS = ["figure"];
 const TABLE_TAGS = ["table"];
-const CODE_TAGS = ["pre", "code"];
+const PRE_TAGS = ["pre"];
 const MATH_TAGS = ["math"];
 const BLOCKQUOTE_TAGS = ["blockquote"];
 const IMG_TAGS = ["img"];
 const CAPTION_TAGS = ["figcaption"];
 
-const P_TAGS = ["p"];
-const LI_TAGS = ["li"];
-const LINK_TAGS = ["a"];
-
 const GROUP_TAGS = ["div", "section"];
 const LIST_TAGS = ["ul", "ol"];
 
-const ATOM_TAGS = HEADER_TAGS.concat(
+const P_TAGS = ["p"];
+const LI_TAGS = ["li"];
+
+const CODE_TAGS = ["code"];
+const LINK_TAGS = ["a"];
+
+const ATOM_TAGS = [].concat(
+    HEADER_TAGS,
     TABLE_TAGS,
-    CODE_TAGS,
+    PRE_TAGS,
     BLOCKQUOTE_TAGS,
     IMG_TAGS,
     CAPTION_TAGS
 );
 const PARA_TAGS = [].concat(GROUP_TAGS, LIST_TAGS, P_TAGS, LI_TAGS);
+
+const CUSTOM_CSS = `
+.airead-atomized {
+    border: 1px solid red;
+    background-color: #ffcccc;
+}
+`;
 
 function get_tag(element) {
     return element.tagName.toLowerCase();
@@ -87,10 +97,10 @@ class ReadableElementsSelector {
         }
         return atomized_elements;
     }
-    add_border_to_atomized_elements() {
+    add_style_to_atomized_elements() {
         var atomized_elements = this.select_atomized_elements();
         for (var i = 0; i < atomized_elements.length; i++) {
-            atomized_elements[i].style.border = "1px solid red";
+            atomized_elements[i].classList.add("airead-atomized");
         }
     }
 }
@@ -99,6 +109,10 @@ class ReadableElementsSelector {
     "use strict";
     console.log("Plugin Loaded");
 
-    var selector = new ReadableElementsSelector();
-    selector.add_border_to_atomized_elements();
+    let style_element = document.createElement("style");
+    style_element.textContent = CUSTOM_CSS;
+    document.head.appendChild(style_element);
+
+    const selector = new ReadableElementsSelector();
+    selector.add_style_to_atomized_elements();
 })();
