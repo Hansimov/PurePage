@@ -21,11 +21,14 @@ const CAPTION_TAGS = ["figcaption"];
 
 const GROUP_TAGS = ["div", "section"];
 const LIST_TAGS = ["ul", "ol"];
+const DEF_TAGS = ["dl"];
 const FIGURE_TAGS = ["figure"];
 
 const P_TAGS = ["p"];
 const LI_TAGS = ["li"];
+const DD_TAGS = ["dt", "dd"];
 const LINK_TAGS = ["a"];
+const SPAN_TAGS = ["span"];
 
 const MATH_TAGS = ["math"];
 const CODE_TAGS = ["code"];
@@ -38,12 +41,19 @@ const ATOM_TAGS = [].concat(
     IMG_TAGS,
     CAPTION_TAGS
 );
-const PARA_TAGS = [].concat(GROUP_TAGS, LIST_TAGS, P_TAGS, LI_TAGS);
+const PARA_TAGS = [].concat(
+    GROUP_TAGS,
+    LIST_TAGS,
+    DEF_TAGS,
+    P_TAGS,
+    LI_TAGS,
+    DD_TAGS
+);
 
 const CUSTOM_CSS = `
 .airead-info-element {
-    border: 1px solid red;
-    background-color: #ffcccc;
+    border: 1px solid red !important;
+    background-color: #ffcccc !important;
 }
 `;
 
@@ -69,10 +79,14 @@ const WIKIPEDIA_REMOVABLE_CLASSES = [
     "contentSub",
     "siteNotice",
 ];
+const ARXIV_REMOVABLE_CLASSES = ["(ltx_)((flex_break)|(pagination))"];
+const DOCS_PYTHON_REMOVABLE_CLASSES = ["clearer"];
 
 const REMOVABLE_CLASSES = [].concat(
     COMMON_REMOVABLE_CLASSES,
-    WIKIPEDIA_REMOVABLE_CLASSES
+    WIKIPEDIA_REMOVABLE_CLASSES,
+    ARXIV_REMOVABLE_CLASSES,
+    DOCS_PYTHON_REMOVABLE_CLASSES
 );
 
 // Helper Functions
