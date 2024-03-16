@@ -128,7 +128,16 @@ class ReadableElementsSelector {
                 descents,
                 PARA_TAGS
             );
-            return !(is_parent_has_atom || is_descent_has_para);
+            // if descent has atom, and descent count is equal to 1, then it is not atomized
+            const is_descent_has_only_atom =
+                descents.length === 1 &&
+                is_elements_has_tag(descents, ATOM_TAGS);
+
+            return !(
+                is_parent_has_atom ||
+                is_descent_has_para ||
+                is_descent_has_only_atom
+            );
         }
         return false;
     }
