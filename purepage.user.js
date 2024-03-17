@@ -52,7 +52,7 @@ const PARA_TAGS = [].concat(
 
 const CUSTOM_CSS = `
 .pure-element {
-    border: 1px solid azure !important;
+    border: 1px solid #ffcccc !important;
 }
 
 .pure-element:hover {
@@ -69,10 +69,12 @@ const WIKIPEDIA_REMOVED_CLASSES = [
     "(vector-)((user-links)|(menu-content)|(body-before-content)|(page-toolbar))",
     "(footer-)((places)|(icons))",
 ];
+const ARXIV_REMOVED_CLASSES = ["(ltx_)(page_footer)"];
 
 const REMOVED_CLASSES = [].concat(
     COMMON_REMOVED_CLASSES,
-    WIKIPEDIA_REMOVED_CLASSES
+    WIKIPEDIA_REMOVED_CLASSES,
+    ARXIV_REMOVED_CLASSES
 );
 
 // Excluded Elements classes and ids
@@ -84,6 +86,8 @@ const COMMON_EXCLUDED_CLASSES = [
     "topbar",
     "offcanvas",
     "navbar",
+    "sf-hidden",
+    "noprint",
 ];
 const WIKIPEDIA_EXCLUDED_CLASSES = [
     "(mw-)((jump-link)|(valign-text-top))",
@@ -197,7 +201,10 @@ class ReadableElementsSelector {
                         REMOVED_CLASSES[i]
                     )
                 ) {
+                    // remove element from DOM
                     output_elements[j].remove();
+                    // remove element from output_elements
+                    output_elements.splice(j, 1);
                 }
             }
         }
@@ -223,14 +230,15 @@ class ReadableElementsSelector {
         }
         return output_elements;
     }
-    add_style_to_reading_elements() {
-        let reading_elements = get_descendants(document.body);
-        this.filter_removed_elements(reading_elements);
-        reading_elements = this.filter_excluded_elements(reading_elements);
-        reading_elements = this.filter_atom_elements(reading_elements);
-        console.log("Reading elements count:", reading_elements.length);
-        for (let i = 0; i < reading_elements.length; i++) {
-            reading_elements[i].classList.add("pure-element");
+    add_style_to_pure_elements() {
+        let pure_elements = get_descendants(document.body);
+        this.filter_removed_elements(pure_elements);
+        pure_elements = this.filter_excluded_elements(pure_elements);
+        pure_elements = this.filter_atom_elements(pure_elements);
+        console.log("Pure elements count:", pure_elements.length);
+        for (let i = 0; i < pure_elements.length; i++) {
+            pure_elements[i].classList.add("pure-element");
+            pure_elements[i].classList.add(`pure-element-id-${i}`);
         }
     }
 }
@@ -246,5 +254,5 @@ class ReadableElementsSelector {
     document.head.appendChild(style_element);
 
     const selector = new ReadableElementsSelector();
-    selector.add_style_to_reading_elements();
+    selector.add_style_to_pure_elements();
 })();
