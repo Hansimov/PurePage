@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PurePage
 // @namespace    http://tampermonkey.net/
-// @version      0.3.2
+// @version      0.3.3
 // @description  Purify webpage by filtering tags and classes
 // @author       Hansimov
 // @match        http://127.0.0.1:17777/*.html
