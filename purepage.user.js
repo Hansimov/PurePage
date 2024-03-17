@@ -7,7 +7,6 @@
 // @match        http://127.0.0.1:17777/*.html
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=0.1
 // @grant        none
-// @require      file:///E:/_codes/purepage/purepage.user.js
 // ==/UserScript==
 
 // Informative Tags
@@ -245,9 +244,9 @@ class ReadableElementsSelector {
 
 // Main Function
 
-(function () {
+window.purepage = function () {
     "use strict";
-    console.log("Plugin Loaded");
+    console.log("PurePage Loaded.");
 
     let style_element = document.createElement("style");
     style_element.textContent = CUSTOM_CSS;
@@ -255,4 +254,4 @@ class ReadableElementsSelector {
 
     const selector = new ReadableElementsSelector();
     selector.add_style_to_pure_elements();
-})();
+};
