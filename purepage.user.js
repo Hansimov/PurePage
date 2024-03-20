@@ -239,19 +239,27 @@ class ReadableElementsSelector {
             pure_elements[i].classList.add("pure-element");
             pure_elements[i].classList.add(`pure-element-id-${i}`);
         }
+        this.pure_elements = pure_elements;
+        return pure_elements;
     }
 }
 
-// Main Function
+// Export function
 
-window.purepage = function () {
-    "use strict";
-    console.log("PurePage Loaded.");
-
+function purepage() {
     let style_element = document.createElement("style");
     style_element.textContent = CUSTOM_CSS;
     document.head.appendChild(style_element);
 
     const selector = new ReadableElementsSelector();
-    selector.add_style_to_pure_elements();
-};
+    let pure_elements = selector.add_style_to_pure_elements();
+    return pure_elements;
+}
+
+// Main function
+
+(function () {
+    "use strict";
+    window.purepage = purepage;
+    console.log("+ Plugin loaded: PurePage");
+})();
