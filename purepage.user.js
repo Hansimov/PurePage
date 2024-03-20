@@ -160,7 +160,7 @@ function calc_width_of_descendants(element) {
 
 // Main Classes
 
-class ReadableElementsSelector {
+class PureElementsSelector {
     constructor() {}
     is_atomized(element) {
         const tag = get_tag(element);
@@ -229,30 +229,44 @@ class ReadableElementsSelector {
         }
         return output_elements;
     }
-    add_style_to_pure_elements() {
+    numbering_elements(elements) {
+        console.log("Pure elements count:", elements.length);
+        for (let i = 0; i < elements.length; i++) {
+            elements[i].classList.add("pure-element");
+            elements[i].classList.add(`pure-element-id-${i}`);
+        }
+        return elements;
+    }
+    stylize() {
+        let style_element = document.createElement("style");
+        style_element.textContent = CUSTOM_CSS;
+        document.head.appendChild(style_element);
+        for (let element of this.pure_elements) {
+            // if element in h1~h6, and it has no color set, then make it blue
+            if (element.tagName.match(/h[1-6]/i)) {
+                if (!element.style.color) {
+                    element.style.color = "blue";
+                }
+            }
+        }
+    }
+    select() {
         let pure_elements = get_descendants(document.body);
         this.filter_removed_elements(pure_elements);
         pure_elements = this.filter_excluded_elements(pure_elements);
         pure_elements = this.filter_atom_elements(pure_elements);
-        console.log("Pure elements count:", pure_elements.length);
-        for (let i = 0; i < pure_elements.length; i++) {
-            pure_elements[i].classList.add("pure-element");
-            pure_elements[i].classList.add(`pure-element-id-${i}`);
-        }
+        pure_elements = this.numbering_elements(pure_elements);
         this.pure_elements = pure_elements;
-        return pure_elements;
+        return this.pure_elements;
     }
 }
 
 // Export function
 
 function purepage() {
-    let style_element = document.createElement("style");
-    style_element.textContent = CUSTOM_CSS;
-    document.head.appendChild(style_element);
-
-    const selector = new ReadableElementsSelector();
-    let pure_elements = selector.add_style_to_pure_elements();
+    const selector = new PureElementsSelector();
+    let pure_elements = selector.select();
+    selector.stylize();
     return pure_elements;
 }
 
@@ -261,5 +275,6 @@ function purepage() {
 (function () {
     "use strict";
     window.purepage = purepage;
+    window.PureElementsSelector = PureElementsSelector;
     console.log("+ Plugin loaded: PurePage");
 })();
