@@ -51,12 +51,12 @@ const PARA_TAGS = [].concat(
 
 const CUSTOM_CSS = `
 .pure-element {
-    border: 1px solid #ffcccc !important;
+    // border: 1px solid #ffcccc !important;
 }
 
 .pure-element:hover {
     // border: 1px solid azure !important;
-    background-color: azure !important;
+    // background-color: azure !important;
 }
 `;
 
